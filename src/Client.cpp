@@ -28,6 +28,7 @@ void Client::input()
 
 		if (connected)
 		{
+			socket->send(reinterpret_cast<char*>(str.data()), str.length());
 		}
 	}
 }
