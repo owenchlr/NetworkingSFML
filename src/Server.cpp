@@ -15,9 +15,12 @@ void Server::init()
 
 void Server::run()
 {
+	std::thread input_thread([&] {input(); });
+	input_thread.detach();
+
 	while (running)
 	{
-		sf::TcpSocket & c_sock = * connections.emplace_back(std::make_unique<sf::TcpSocket>());
+		sf::TcpSocket& c_sock = *connections.emplace_back(std::make_unique<sf::TcpSocket>());
 
 		if (listener->accept(c_sock) != sf::Socket::Status::Done)
 		{
@@ -27,6 +30,21 @@ void Server::run()
 		}
 
 		std::cout << "Client connected @ " << c_sock.getRemotePort() << "\n";
+
+		workers.emplace_back([&] {
+			listen(c_sock);
+			std::cout << "Disconnect detected\n";
+			std::lock_guard<std::mutex> lck(mutex);
+
+			for (int i = 0; i < connections.size(); i++)
+			{
+				if (connections[i]->getRemotePort() == c_sock.getRemotePort())
+				{
+					connections.erase(std::next(connections.begin(), i));
+					break;
+				}
+			}
+		});
 	}
 }
 

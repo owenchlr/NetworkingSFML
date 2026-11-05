@@ -64,7 +64,8 @@ void Game::mouseButtonPressed(const sf::Event::MouseButtonPressed* event)
             std::cout << "Creating Sever\n";
             server = std::make_unique<Server>();
             server->init();
-            server->run();
+            std::thread server_thread([&] {server->run();});
+            server_thread.detach();
         }
         else if (join_text->getGlobalBounds().contains(sf::Vector2f(event->position)))
         {
@@ -72,6 +73,8 @@ void Game::mouseButtonPressed(const sf::Event::MouseButtonPressed* event)
             std::cout << "Attempting connection to server\n";
             client = std::make_unique<Client>();
             client->connect();
+            std::thread client_thread([&] {client->run();});
+            client_thread.detach();
         }
     }
 
