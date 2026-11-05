@@ -21,6 +21,15 @@ class Game
 	void mouseMoved(const sf::Event::MouseMoved* event);
 
  private:
+
+	 enum gameStates
+	 {
+		 MENU,
+		 GAME
+	 };
+
+	 gameStates game_state = MENU;
+
 	sf::RenderWindow& window;
 
 	std::shared_ptr<Board> board;

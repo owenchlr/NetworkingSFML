@@ -55,7 +55,26 @@ void Game::render()
 }
 
 void Game::mouseButtonPressed(const sf::Event::MouseButtonPressed* event)
-{
+{   
+    if (game_state == MENU)
+    {
+        if (host_text->getGlobalBounds().contains(sf::Vector2f(event->position)))
+        {
+            game_state = GAME;
+            std::cout << "Creating Sever\n";
+            server = std::make_unique<Server>();
+            server->init();
+            server->run();
+        }
+        else if (join_text->getGlobalBounds().contains(sf::Vector2f(event->position)))
+        {
+            game_state = GAME;
+            std::cout << "Attempting connection to server\n";
+            client = std::make_unique<Client>();
+            client->connect();
+        }
+    }
+
     board->mouseButtonPressed(event);
 }
 
